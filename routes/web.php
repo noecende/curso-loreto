@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\MascotaController;
 use App\Http\Controllers\MathController;
+use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
 use App\Utils\Ejemplo;
 use Illuminate\Http\Request;
@@ -50,7 +52,7 @@ Route::post('/formulario', function(Request $req) {
 
 Route::post('/concatenacion', function(Request $req) {
     //
-    return "Concatenación $req->uno $req->dos"; 
+    return "Concatenación $req->uno $req->dos";
 });
 
 Route::post('/concatenacion2', function(Request $req) {
@@ -114,10 +116,19 @@ Route::post('/operacion/{numA}/{numB}' , function(Request $req, $numA, $numB) {
  *  
  *  Primer objeto del array debe ir la clase del controlador.
  *  Segundo objeto: el nombre del método que queremos asignar.
- * 
  */
 Route::get('/factorialRecursivo/{num}', [MathController::class, 'factorialRecursivo']);
 /**
  * Ruta operación pero implementando controladores.
  */
 Route::post('/operacionController', [MathController::class, 'operacion']);
+
+/**Devuelve un formulario para crear una mascota.*/
+Route::get('/crearMascota', [MascotaController::class, 'crear']);
+
+//API del recurso mascotas
+//Vamos a utilizar sintaxis de REST.
+Route::post('/mascotas', [MascotaController::class, 'post']);
+
+
+Route::get('/crearUsuario', [UsuarioController::class, 'create']);
