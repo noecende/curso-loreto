@@ -19,7 +19,11 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/', function () {
-    return view('polo');
+    return view('landing');
+});
+
+Route::get('/login', function() {
+    return view('login');
 });
 
 Route::get('/holaMundoWeb', function() {
@@ -123,12 +127,19 @@ Route::get('/factorialRecursivo/{num}', [MathController::class, 'factorialRecurs
  */
 Route::post('/operacionController', [MathController::class, 'operacion']);
 
-/**Devuelve un formulario para crear una mascota.*/
-Route::get('/crearMascota', [MascotaController::class, 'crear']);
-
 //API del recurso mascotas
 //Vamos a utilizar sintaxis de REST.
-Route::post('/mascotas', [MascotaController::class, 'post']);
+//Route::post('/mascotas', [MascotaController::class, 'post']);
+
+//Asigna todos los verbos http y todos los métodos para mostrar formularios
+Route::resource('/usuarios', UsuarioController::class);
+
+Route::resource('/mascotas', MascotaController::class);
 
 
-Route::get('/crearUsuario', [UsuarioController::class, 'create']);
+
+
+// localhost/usuarios
+// localhost/usuarios/{id} -> get, put, delete
+// localhost/usuarios/create mostrar formulario para crear
+// localhost/usuarios/{id}/edit mostrar formulario para editar
