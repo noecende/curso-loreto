@@ -23,6 +23,11 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
+        'is_admin'
+    ];
+
+    protected $attributes = [
+        'is_admin' => false
     ];
 
     /**

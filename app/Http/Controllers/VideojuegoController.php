@@ -5,10 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Videojuego;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class VideojuegoController extends Controller
 {
+    public function __construct()
+    {
+        //Elegimos los métodos que no requerimos protección.
+        $this->middleware('auth'); 
+        //Elegimos las rutas a las que le vamos a aplicar la protección.
+        //$this->middleware('auth')->only(['store', 'update', 'delete', 'show']);
+    }
     /**
      * Display a listing of the resource.
      *  
@@ -17,6 +25,10 @@ class VideojuegoController extends Controller
     public function index(Request $request)
     {
         //
+        $user = Auth::user();
+        if($user->cant('viewAny', Videojuego::class)) {
+            return 'Acceso denegado';
+        }
         $user = User::find($request->user_id);
         //Las relaciones devuelven colecciones
         $videojuegos = $user->videojuegos; //Devuelve una colección de videojuegos.
@@ -87,9 +99,21 @@ class VideojuegoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Videojuego $videojuego)
     {
         //
+        $user = Auth::user();
+        if($user->cant('update', $videojuego)) {
+            return 'acceso denegado';
+        }
+
+        $videojuego ->nombre = $request->nombre;
+        $videojuego->descripcion = $request->descripcion;
+        $videojuego->fecha_lanzamiento = $request->fecha_lanzamiento;
+        $videojuego->consola = $request->consola;
+        $videojuego->categoria_id = $request->categoria_id;
+        $videojuego->user_id = $request->user_id;
+        $videojuego->save();
     }
 
     /**

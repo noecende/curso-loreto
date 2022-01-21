@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Vacuna;
 use App\Models\Videojuego;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ConsultasController extends Controller
 {
@@ -55,9 +56,36 @@ class ConsultasController extends Controller
         return $usuarios;
     }
 
-    //Hacer ruta que utilice el método where. 
+    public function consultaUnion()
+    {
+        //$videojuegos = DB::table('videojuegos')->select('titulo as nombre', 'descripcion')->get(); 
+        //Cuando usamos expresiones crudas tenemos que sanitizar la entrada. 
+        //$resultado = DB::table(DB::raw('videojuegos, users'))->select('*')->where('videojuegos.user_id', 2)->get();
 
-    //Hacer ruta que utilice el método orWhere (tener más de un where con or).
+        
+        /* $resultado = DB::table('users')
+                        ->join('videojuegos', 'users.id', '=', 'videojuegos.user_id')
+                        ->join('telefonos', 'users.id', '=', 'telefonos.user_id')
+                        ->where('consola', 'pc')
+                        ->get(); */
+        /* $resultado = DB::table('mascotas')
+                        ->join(
+                            DB::raw('
+                            (
+                                SELECT 
+                                   vacunas.nombre AS vacuna, mascotas_vacunas.mascota_id AS mascota_id
+                                FROM
+                                    mascotas_vacunas
+                                INNER JOIN vacunas ON vacunas.id = mascotas_vacunas.vacuna_id) AS subquery'), 'mascotas.id', '=', 'subquery.mascota_id')
+                        ->get(); */
+        //$resultados = DB::select(DB::raw('call procedimiento()'))->get();  
+        
+        $resultados = User::where(function ($query) {
+            $query->select('telefono')->from('telefonos')->whereColumn('telefonos.chip', 'telcel')->whereColumn('telefonos.chip', 'users.id');
+        })->get(); 
+        
+        return $resultados;
+    }
 
 
 }

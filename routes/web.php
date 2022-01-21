@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ConsultasController;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MascotaController;
 use App\Http\Controllers\MathController;
 use App\Http\Controllers\PostController;
@@ -26,10 +27,6 @@ use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return view('landing');
-});
-
-Route::get('/login', function() {
-    return view('login');
 });
 
 Route::get('/holaMundoWeb', function() {
@@ -137,9 +134,6 @@ Route::post('/operacionController', [MathController::class, 'operacion']);
 //Vamos a utilizar sintaxis de REST.
 //Route::post('/mascotas', [MascotaController::class, 'post']);
 
-//Asigna todos los verbos http y todos los métodos para mostrar formularios
-Route::resource('/usuarios', UsuarioController::class);
-
 Route::resource('/mascotas', MascotaController::class);
 
 Route::resource('/users', UserController::class);
@@ -152,7 +146,8 @@ Route::resource('/posts', PostController::class);
 
 Route::resource('/vacunas', VacunaController::class);
 
-Route::post('/vacunas/{vacuna}/mascotas/{mascota}', [VacunaController::class, 'aplicarVacuna']);
+Route::middleware('auth')
+        ->post('/vacunas/{vacuna}/mascotas/{mascota}', [VacunaController::class, 'aplicarVacuna']);
 
 
 // localhost/usuarios
@@ -169,3 +164,12 @@ Route::get('/videojuegosPorCategoria', [ConsultasController::class, 'videojuegos
 Route::get('/ejemploOr', [ConsultasController::class, 'ejemploOr']);
 
 Route::get('/ejemploEagerLoading', [ConsultasController::class, 'usuariosConVideojuegos']);
+
+Route::get('/union', [ConsultasController::class, 'consultaUnion']);
+
+Route::get('/login', [LoginController::class, 'mostrarFormulario'])->name('login');
+
+Route::post('/login', [LoginController::class, 'login']);
+
+Route::get('/logout', [LoginController::class, 'logout']);
+

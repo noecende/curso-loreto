@@ -4,11 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Mascota;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class MascotaController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      * Listar todas las mascotas.
@@ -75,17 +81,23 @@ class MascotaController extends Controller
             return redirect('/mascotas/create')->withErrors($validator)->withInput();
         }
 
-        //Guardaríamos la mascota.
-        //Podemos mandar todo el arreglo por el constructor. 
-        //O podemos acceder a los atributos como atributos dinámicos del objeto
-        $mascota = new Mascota($request->all());
-        /* $mascota->nombre = $request->nombre;
-        $mascota->especie = $request->especie;
-        $mascota->edad = $request->edad;
-        mascota->fecha = $request->fecha; */
-        //Hacer la consulta.
-        $mascota->save();
-        return redirect('/mascotas');
+        if(Auth::user()->cant('create', Mascota::class)) {
+            return "Permiso denegado";
+        }
+
+        if(Auth::user()->can('create', Mascota::class)) {
+            //Guardaríamos la mascota.
+            //Podemos mandar todo el arreglo por el constructor. 
+            //O podemos acceder a los atributos como atributos dinámicos del objeto
+            $mascota = new Mascota($request->all());
+            /* $mascota->nombre = $request->nombre;
+            $mascota->especie = $request->especie;
+            $mascota->edad = $request->edad;
+            mascota->fecha = $request->fecha; */
+            //Hacer la consulta.
+            $mascota->save();
+            return redirect('/mascotas');
+        }
     }
 
     /**

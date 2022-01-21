@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Telefono;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -60,7 +61,7 @@ class UserController extends Controller
         $user = new User(); //Instanciamos el modelo.
         $user->name = $request->name;
         $user->lastname = $request->lastname;
-        $user->password = $request->password;
+        $user->password = Hash::make($request->password);
         $user->email = $request->email;
         $user->username = $request->username;
         $user->save(); //realizamos la consulta sql.
@@ -88,8 +89,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $user->telefono; //Devuelve el objeto del telefono.
-        return $user;
+        return view('Perfil', ['user' => $user]);
     }
 
     /**

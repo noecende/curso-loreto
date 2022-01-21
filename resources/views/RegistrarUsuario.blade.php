@@ -115,6 +115,10 @@
                     </div>
                     @endError
                 </div>
+                <div class="mb-3 col-6">
+                    <label for="image" class="form-label">Selecciona una imagen</label>
+                    <input class="form-control" type="file" id="image" name="image">
+                </div>
                 <button class="btn btn-primary" type="submit">Enviar</button>
             </form>
         </div>

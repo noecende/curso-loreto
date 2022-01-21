@@ -34,28 +34,40 @@
                     </li> -->
                 </ul>
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/usuarios/create">Regístrate</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Iniciar sesión</a>
-                    </li>
-                    <!-- <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Leopoldo Madero
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#">Configuración</a></li>
-                            <li><a class="dropdown-item" href="#">Cerrar sesión</a></li>
-                        </ul>
-                    </li> -->
+                    @if(!Auth::user())
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/usuarios/create">Regístrate</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/login">Iniciar sesión</a>
+                        </li>
+                    @else
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Leopoldo Madero
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="#">Configuración</a></li>
+                                <li><a class="dropdown-item" href="/logout">Cerrar sesión</a></li>
+                            </ul>
+                        </li>
+                    @endif
+                    
                 </ul>
             </div>
         </div>
     </nav>
     <div class="container mt-3">
-        <h1 class="display-2 text-center">Bienvenidos a Twitter Fake</h1>
+        <h1 class="display-2 text-center">
+            @auth 
+                Bienvenid@ {{Auth::user()->name}}
+            @endAuth
+            @guest
+                Bienvenidos a Twitter Fake
+            @endGuest
+            
+        </h1>
         <p class="display-6 text-center">Un proyecto para el curso de Laravel.</p>
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Logo.min.svg/2560px-Logo.min.svg.png"
             class="img-fluid mt-5 mx-auto d-block w-50">
