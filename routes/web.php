@@ -1,8 +1,14 @@
 <?php
 
+use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\ConsultasController;
 use App\Http\Controllers\MascotaController;
 use App\Http\Controllers\MathController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\VacunaController;
+use App\Http\Controllers\VideojuegoController;
 use Illuminate\Support\Facades\Route;
 use App\Utils\Ejemplo;
 use Illuminate\Http\Request;
@@ -136,10 +142,30 @@ Route::resource('/usuarios', UsuarioController::class);
 
 Route::resource('/mascotas', MascotaController::class);
 
+Route::resource('/users', UserController::class);
 
+Route::resource('/categorias', CategoriaController::class);
+
+Route::resource('/videojuegos', VideojuegoController::class);
+
+Route::resource('/posts', PostController::class);
+
+Route::resource('/vacunas', VacunaController::class);
+
+Route::post('/vacunas/{vacuna}/mascotas/{mascota}', [VacunaController::class, 'aplicarVacuna']);
 
 
 // localhost/usuarios
 // localhost/usuarios/{id} -> get, put, delete
 // localhost/usuarios/create mostrar formulario para crear
 // localhost/usuarios/{id}/edit mostrar formulario para editar
+
+/**Ejercicios de query con eloquent **/
+
+Route::get('/vacunasNDosis', [ConsultasController::class, 'obtenerVacunasNDosis']);
+
+Route::get('/videojuegosPorCategoria', [ConsultasController::class, 'videojuegosPorCategoria']);
+
+Route::get('/ejemploOr', [ConsultasController::class, 'ejemploOr']);
+
+Route::get('/ejemploEagerLoading', [ConsultasController::class, 'usuariosConVideojuegos']);

@@ -25,4 +25,13 @@ class Mascota extends Model
     protected $attributes = [
          'especie' => 'perro'
     ];
+
+    /**
+     * Relación muchos a muchos.
+     */
+    public function vacunas()
+    {
+        //Una mascota puede tener muchas vacunas.
+        return $this->belongsToMany(Vacuna::class, 'mascotas_vacunas');
+    }
 }
