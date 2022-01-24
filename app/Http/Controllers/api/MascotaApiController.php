@@ -1,56 +1,32 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Resources\MascotaResource;
 use App\Models\Mascota;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
-class MascotaController extends Controller
+class MascotaApiController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth:sanctum');
     }
 
     /**
      * Display a listing of the resource.
-     * Listar todas las mascotas.
+     *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
         //
-        /* $mascotas = [
-            'titulo' => 'Mascotas',
-            'mascotas' => [[
-                'nombre' => 'Silvio',
-                'edad' => 12, 
-                'fecha_nacimiento' => '2019-01-13', 
-                'especie' => 'Gato'], [
-                    'nombre' => 'Zeus',
-                    'edad' => 6, 
-                    'fecha_nacimiento' => '2015-06-13', 
-                    'especie' => 'Perro']
-            ]
-        ]; */
-        $mascotas = Mascota::all(); //Realiza consulta sql para obtener todas las mascotas.
-        return view('Mascotas', [
-            'mascotas' => $mascotas
-        ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-        return view('CrearMascota', ['titulo' => 'Crear Mascota']);
+        $mascotas = Mascota::with('vacunas')->get(); //Get
+        return MascotaResource::collection($mascotas);
     }
 
     /**
@@ -78,12 +54,15 @@ class MascotaController extends Controller
         $validator = Validator::make($request->input(), $reglas);
 
         if($validator->fails()) {
-            return redirect('/mascotas/create')->withErrors($validator)->withInput();
+            return response()->json([
+                'category' => 'validacion',
+                'errors' => $validator->errors()
+            ], 400);
         }
 
-        if(Auth::user()->cant('create', Mascota::class)) {
+        /* if(Auth::user()->cant('create', Mascota::class)) {
             return "Permiso denegado";
-        }
+        } */
 
         //Guardaríamos la mascota.
         //Podemos mandar todo el arreglo por el constructor. 
@@ -95,8 +74,7 @@ class MascotaController extends Controller
         mascota->fecha = $request->fecha; */
         //Hacer la consulta.
         $mascota->save();
-        return redirect('/mascotas');
-        
+        return $mascota;
     }
 
     /**
@@ -108,33 +86,38 @@ class MascotaController extends Controller
     public function show($id)
     {
         //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     * Mostrar formulario para actualizar el recurso.
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Mascota $mascota)
-    {
-        //$mascota = Mascota::find($id);  //Buscar mascota por id en la base de datos.
-        return view('EditarMascota', [
-            'mascota' => $mascota]);
+        $mascota = Mascota::find($id);
+        if($mascota == null) {
+            return response()->json([
+                'errors' => 'La mascota no existe en la base de datos.',
+                'category' => 'Not found.'
+            ], 404);
+        }
+        return $mascota;
     }
 
     /**
      * Update the specified resource in storage.
-     * METODO PUT DE HTTP
+     *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
+        //
+        $mascota = Mascota::find($id);
+        if($mascota == null) {
+            return response()->json([
+                'errors' => 'La mascota no existe en la base de datos.',
+                'category' => 'Not found.'
+            ], 404);
+        }
+
         $reglas = [
-            'nombre' => 'required|string',
+            'nombre' => 'sometimes|required|string',
             'especie' => [
+                'sometimes',
                 'required',
                 Rule::in([
                     'perro', 
@@ -142,24 +125,38 @@ class MascotaController extends Controller
                     'pez', 
                     'tortuga', 
                     'cuyo'])],
-            'edad' => ['required', 'integer', 'gt:0'],
-            'fecha' => ['required', 'date']
+            'edad' => ['sometimes', 'required', 'integer', 'gte:0'],
+            'fecha' => ['sometimes', 'required', 'date']
         ];
 
         $validator = Validator::make($request->input(), $reglas);
 
         if($validator->fails()) {
-            return redirect("/mascotas/$id/edit")->withErrors($validator)->withInput();
+            return response()->json([
+                'category' => 'validacion',
+                'errors' => $validator->errors()
+            ], 400);
         }
 
-        //Obtenemos el modelo.
-        $mascota = Mascota::find($id);
-        $mascota->nombre = $request->nombre;
-        $mascota->edad = $request->edad;
-        $mascota->fecha = $request->fecha;
-        $mascota->especie = $request->especie;
+        //Si el campo está presente, lo colocamos en la mascota.
+        if($request->nombre != null) {
+            $mascota->nombre = $request->nombre;
+        }
+
+        if($request->especie != null) {
+            $mascota->especie = $request->especie;
+        }
+
+        if($request->edad != null) {
+            $mascota->edad = $request->edad;
+        }
+
+        if($request->fecha != null) {
+            $mascota->fecha = $request->fecha;
+        }
+
         $mascota->save();
-        return redirect('/mascotas');
+        return $mascota;
     }
 
     /**
@@ -169,10 +166,15 @@ class MascotaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {
-        //
-        $mascota = Mascota::find($id); //Buscar la mascota por id en la base de datos.
-        $mascota->delete(); //Hacer consulta a la base de datos para eliminar el modelo.
-        return redirect('/mascotas');
+    { 
+        $mascota = Mascota::find($id); //Una instancia del modelo. Si no lo encuentra, devuelve null.
+        if($mascota == null) {
+            return response()->json([
+                'errors' => 'La mascota no existe en la base de datos.',
+                'category' => 'Not found.'
+            ], 404);
+        }
+        $mascota->delete();
+        return $mascota;
     }
 }

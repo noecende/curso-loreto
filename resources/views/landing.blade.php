@@ -36,7 +36,7 @@
                 <ul class="navbar-nav ms-auto">
                     @if(!Auth::user())
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/usuarios/create">Regístrate</a>
+                            <a class="nav-link active" aria-current="page" href="/users/create">Regístrate</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="/login">Iniciar sesión</a>
